@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 قاموس الأستاذ الذكي - AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            padding: 20px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 30px;
+            padding: 40px 30px;
+            margin-bottom: 30px;
+            border: 2px solid #6d28d9;
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+        }
+
+        .app-name {
+            color: #c084fc;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .main-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #c084fc 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-section {
+            margin: 30px 0;
+        }
+
+        .input-container {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border-radius: 25px;
+            padding: 5px;
+            border: 2px solid #6d28d9;
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .word-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 18px 25px;
+            color: white;
+            font-size: 20px;
+            text-align: center;
+            outline: none;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 20px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .loading {
+            display: none;
+            margin: 30px 0;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #333;
+            border-top: 4px solid #ec4899;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border-radius: 30px;
+            padding: 35px;
+            margin: 20px 0;
+            border: 2px solid #6d28d9;
+            box-shadow: 0 0 40px rgba(124, 58, 237, 0.3);
+        }
+
+        .result-emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .result-word-ar {
+            font-size: 42px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .result-word-en {
+            font-size: 32px;
+            color: #c084fc;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .result-pronunciation {
+            background: rgba(251, 191, 36, 0.2);
+            padding: 15px 30px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 15px 0;
+            font-size: 24px;
+            color: #fbbf24;
+        }
+
+        .translation-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 2px solid #6d28d9;
+            text-align: right;
+        }
+
+        .translation-box h3 {
+            color: #c084fc;
+            margin-bottom: 15px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .translation-text {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .image-description {
+            color: #e9d5ff;
+            font-size: 18px;
+            line-height: 1.8;
+            text-align: right;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            border-right: 4px solid #ec4899;
+        }
+
+        .result-sentence {
+            font-size: 22px;
+            color: #fff;
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(124, 58, 237, 0.2);
+            border-radius: 20px;
+            border-right: 4px solid #8b5cf6;
+        }
+
+        /* 🔥 صور حقيقية من الإنترنت */
+        .real-images {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .real-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 3px solid #6d28d9;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        .real-image:hover {
+            transform: scale(1.05);
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            border: none;
+            padding: 15px 35px;
+            border-radius: 25px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 20px 10px;
+        }
+
+        .suggested-chip {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        .suggested-chip:hover {
+            background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-content">
+
+        <div class="user-card">
+            <div class="app-name">🎓 قاموس الأستاذ الذكي</div>
+            <div style="color: #a855f7; font-size: 18px;">محرك AI محاكي - ترجمة فورية + صور</div>
+        </div>
+
+        <h1 class="main-title">
+            تعلم <span class="highlight">الكلمات</span> بلغتين!
+        </h1>
+
+        <div class="input-section">
+            <p style="color: #9ca3af; margin-bottom: 15px;">✨ اكتب جملة كاملة:</p>
+            
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    id="wordInput" 
+                    class="word-input" 
+                    placeholder="مثال: سوف أذهب بالسيارة، قريتي جميلة..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button class="search-btn" onclick="smartTranslate()">
+                    ترجم 🤖
+                </button>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <span class="suggested-chip" onclick="setInput('سوف أذهب بالسيارة')">🚗 سوف أذهب بالسيارة</span>
+                <span class="suggested-chip" onclick="setInput('قريتي جميلة')">🏘️ قريتي جميلة</span>
+                <span class="suggested-chip" onclick="setInput('الفيل ضخم')">🐘 الفيل ضخم</span>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px; color: #c084fc;">جاري الترجمة...</p>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-card">
+                <div class="result-emoji" id="resultEmoji">🎨</div>
+                
+                <!-- النص العربي المدخل -->
+                <div class="result-word-ar" id="resultAr">--</div>
+                
+                <!-- الترجمة الإنجليزية -->
+                <div class="result-word-en" id="resultEn">--</div>
+                
+                <!-- النطق -->
+                <div class="result-pronunciation" id="resultPronunciation">"--"</div>
+                
+                <!-- صندوق الترجمة الذكية -->
+                <div class="translation-box">
+                    <h3>🎯 الترجمة الصحيحة:</h3>
+                    <div class="translation-text" id="correctTranslation">--</div>
+                    
+                    <h3 style="margin-top: 20px;">🎨 وصف الصورة المولدة:</h3>
+                    <div class="image-description" id="imageDescription">
+                        --
+                    </div>
+                </div>
+
+                <div class="result-sentence" id="resultSentence">
+                    📝 شرح القواعد: --
+                </div>
+                
+                <!-- 🔥 صور حقيقية من الإنترنت -->
+                <h3 style="color: #c084fc; margin: 25px 0 15px;">🖼️ صور ذات صلة:</h3>
+                <div class="real-images" id="realImages">
+                    <!-- سيتم إضافة الصور هنا -->
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <button class="generate-btn" onclick="generateNewImage()">
+                        🎨 توليد وصف جديد
+                    </button>
+                    <button class="generate-btn" onclick="speakResult()" style="background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);">
+                        🔊 استمع للنطق
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let lastTranslation = null;
+
+        // قاعدة بيانات للكلمات الشائعة
+        const wordDB = {
+            'سوف': { en: 'will', type: 'future', emoji: '⏰' },
+            'سأ': { en: 'I will', type: 'future', emoji: '⏰' },
+            'أنا': { en: 'I', type: 'pronoun', emoji: '👤' },
+            'أذهب': { en: 'go', type: 'verb', emoji: '🚶' },
+            'اذهب': { en: 'go', type: 'verb', emoji: '🚶' },
+            'بالسيارة': { en: 'by car', type: 'vehicle', emoji: '🚗' },
+            'السيارة': { en: 'the car', type: 'vehicle', emoji: '🚗' },
+            'سيارة': { en: 'car', type: 'vehicle', emoji: '🚗' },
+            'قريتي': { en: 'my village', type: 'place', emoji: '🏘️' },
+            'قرية': { en: 'village', type: 'place', emoji: '🏘️' },
+            'جميلة': { en: 'beautiful', type: 'adjective', emoji: '✨' },
+            'جميل': { en: 'beautiful', type: 'adjective', emoji: '✨' },
+            'فيل': { en: 'elephant', type: 'animal', emoji: '🐘' },
+            'الفيل': { en: 'the elephant', type: 'animal', emoji: '🐘' },
+            'ضخم': { en: 'huge', type: 'adjective', emoji: '🦕' },
+            'ضخمة': { en: 'huge', type: 'adjective', emoji: '🦕' },
+            'كبير': { en: 'big', type: 'adjective', emoji: '📏' },
+            'كبيرة': { en: 'big', type: 'adjective', emoji: '📏' },
+            'صغير': { en: 'small', type: 'adjective', emoji: '🔍' },
+            'صغيرة': { en: 'small', type: 'adjective', emoji: '🔍' },
+            'لطيف': { en: 'cute', type: 'adjective', emoji: '🥰' },
+            'لطيفة': { en: 'cute', type: 'adjective', emoji: '🥰' },
+            'ملون': { en: 'colorful', type: 'adjective', emoji: '🌈' },
+            'ملونة': { en: 'colorful', type: 'adjective', emoji: '🌈' }
+        };
+
+        function smartTranslate() {
+            const input = document.getElementById('wordInput').value.trim();
+            const loading = document.getElementById('loading');
+            const resultSection = document.getElementById('resultSection');
+
+            if (!input) {
+                alert('⚠️ الرجاء كتابة جملة أولاً!');
+                return;
+            }
+
+            loading.classList.add('show');
+            resultSection.classList.remove('show');
+
+            setTimeout(() => {
+                const result = translateSentence(input);
+                lastTranslation = result;
+                displayResult(result);
+                loading.classList.remove('show');
+            }, 1000);
+        }
+
+        function translateSentence(input) {
+            const words = input.split(' ');
+            let englishWords = [];
+            let mainEmoji = '🎨';
+            let category = 'general';
+
+            // ترجمة كل كلمة
+            words.forEach(word => {
+                const cleanWord = word.replace(/[.,!?]/g, '');
+                const wordData = wordDB[cleanWord];
+                
+                if (wordData) {
+                    englishWords.push(wordData.en);
+                    if (wordData.emoji && mainEmoji === '🎨') {
+                        mainEmoji = wordData.emoji;
+                    }
+                    if (wordData.type === 'vehicle') category = 'car';
+                    if (wordData.type === 'animal') category = 'animal';
+                    if (wordData.type === 'place') category = 'village';
+                } else {
+                    // إذا لم تكن الكلمة في القاعدة، نحاول تبسيطها
+                    englishWords.push(word);
+                }
+            });
+
+            // ترتيب الكلمات حسب قواعد الإنجليزية
+            let englishSentence = rearrangeEnglish(englishWords);
+
+            // توليد وصف الصورة
+            const imageDesc = generateImageDescription(input, category);
+
+            return {
+                arabic: input,
+                english: englishSentence,
+                pronunciation: input, // النطق بالعربية
+                correctTranslation: englishSentence,
+                sentence: generateGrammarExplanation(input, words),
+                emoji: mainEmoji,
+                category: category,
+                imageDescription: imageDesc
+            };
+        }
+
+        function rearrangeEnglish(words) {
+            // ترتيب بسيط: الفاعل + الفعل + المفعول
+            let result = words.join(' ');
+            
+            // تصحيحات شائعة
+            result = result.replace('I will will', 'I will');
+            result = result.replace('will I', 'I will');
+            
+            // أول حرف كبير
+            result = result.charAt(0).toUpperCase() + result.slice(1);
+            
+            return result;
+        }
+
+        function generateImageDescription(input, category) {
+            const descriptions = {
+                car: [
+                    "🚗 رسم كرتوني لسيارة ملونة وجميلة، تتحرك بسرعة في شارع مرصوف، أضواء لامعة، سماء زرقاء صافية، أجواء مناسبة للأطفال.",
+                    "🚙 تصميم كرتوني لسيارة حديثة بألوان زاهية (أحمر وأصفر)، عيون أمامية كبيرة كالشخصيات الكرتونية، تبتسم وهي تسير في طريق جميل."
+                ],
+                village: [
+                    "🏘️ منظر كرتوني لقرية هادئة وجميلة، منازل ملونة متقاربة، أشجار خضراء كثيفة، سماء زرقاء مع غيوم بيضاء، أطفال يلعبون في الشوارع.",
+                    "🌳 تصميم فني لقرية ريفية خلابة، بيوت بسقف أحمر، حدائق مزهرة، طيور تطير في السماء، أجواء هادئة وسعيدة."
+                ],
+                animal: [
+                    "🐘 رسم كرتوني لفيل ضخم ولطيف، لون رمادي فاتح، أذنين كبيرتين، خرطوم طويل يلتف، يقف في سافانا ملونة، ابتسامة عريضة.",
+                    "🦕 تصميم كawaii لفيل صغير ظريف، خدود وردية، عيون لامعة، يرتدي قبعة ملونة، يقفز بفرح في حديقة خضراء."
+                ],
+                general: [
+                    "🎨 تصميم كرتوني ملون وجذاب يعبر عن المعنى، ألوان زاهية، خطوط بسيطة، مناسب جداً للأطفال.",
+                    "✨ رسم توضيحي مرح، تفاصيل دقيقة، ألوان متناسقة، يعبر عن المفهوم بشكل واضح وممتع."
+                ]
+            };
+
+            const descs = descriptions[category] || descriptions.general;
+            return descs[Math.floor(Math.random() * descs.length)];
+        }
+
+        function generateGrammarExplanation(input, words) {
+            let explanation = "📚 تحليل الجملة: ";
+            
+            words.forEach((word, index) => {
+                const wordData = wordDB[word];
+                if (wordData) {
+                    explanation += `${word} = ${wordData.en} | `;
+                }
+            });
+            
+            explanation += "\n\n💡 ملاحظة: في الإنجليزية نضع الفاعل أولاً، ثم الفعل، ثم المفعول.";
+            
+            return explanation;
+        }
+
+        function displayResult(result) {
+            document.getElementById('resultEmoji').textContent = result.emoji;
+            document.getElementById('resultAr').textContent = result.arabic;
+            document.getElementById('resultEn').textContent = result.english;
+            document.getElementById('resultPronunciation').textContent = `"${result.pronunciation}"`;
+            document.getElementById('correctTranslation').textContent = result.correctTranslation;
+            document.getElementById('imageDescription').textContent = result.imageDescription;
+            document.getElementById('resultSentence').textContent = result.sentence;
+
+            // 🔥 إضافة صور حقيقية من الإنترنت
+            const imagesContainer = document.getElementById('realImages');
+            const searchTerm = result.category === 'car' ? 'car cartoon' : 
+                              result.category === 'village' ? 'village cartoon' : 
+                              result.category === 'animal' ? 'elephant cartoon' : 'cartoon';
+            
+            imagesContainer.innerHTML = `
+                <img src="https://source.unsplash.com/400x300/?${searchTerm},cartoon&sig=1" 
+                     class="real-image" 
+                     alt="صورة 1"
+                     onerror="this.src='https://via.placeholder.com/400x300/6d28d9/ffffff?text=${result.emoji}'">
+                <img src="https://source.unsplash.com/400x300/?${searchTerm},kids&sig=2" 
+                     class="real-image" 
+                     alt="صورة 2"
+                     onerror="this.src='https://via.placeholder.com/400x300/8b5cf6/ffffff?text=${result.emoji}'">
+                <img src="https://source.unsplash.com/400x300/?${searchTerm},colorful&sig=3" 
+                     class="real-image" 
+                     alt="صورة 3"
+                     onerror="this.src='https://via.placeholder.com/400x300/ec4899/ffffff?text=${result.emoji}'">
+                <img src="https://source.unsplash.com/400x300/?${searchTerm},illustration&sig=4" 
+                     class="real-image" 
+                     alt="صورة 4"
+                     onerror="this.src='https://via.placeholder.com/400x300/10b981/ffffff?text=${result.emoji}'">
+            `;
+
+            document.getElementById('resultSection').classList.add('show');
+        }
+
+        function generateNewImage() {
+            if (!lastTranslation) return;
+            
+            const newDesc = generateImageDescription(lastTranslation.arabic, lastTranslation.category);
+            document.getElementById('imageDescription').textContent = newDesc;
+        }
+
+        function speakResult() {
+            if (!lastTranslation) return;
+            
+            if ('speechSynthesis' in window) {
+                // نطق الإنجليزية
+                const enUtterance = new SpeechSynthesisUtterance(lastTranslation.english);
+                enUtterance.lang = 'en-US';
+                enUtterance.rate = 0.8;
+                speechSynthesis.speak(enUtterance);
+
+                // نطق العربية
+                setTimeout(() => {
+                    const arUtterance = new SpeechSynthesisUtterance(lastTranslation.arabic);
+                    arUtterance.lang = 'ar-SA';
+                    arUtterance.rate = 0.8;
+                    speechSynthesis.speak(arUtterance);
+                }, 2000);
+            }
+        }
+
+        function setInput(text) {
+            document.getElementById('wordInput').value = text;
+            smartTranslate();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                smartTranslate();
+            }
+        }
+    </script>
+
+</body>
+</html>
